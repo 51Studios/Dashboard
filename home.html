@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+
+
+    <!-- ASSETS -->
+    <link rel="stylesheet" type="text/css" href="css/global.css">
+    <link rel="stylesheet" type="text/css" href="css/dashboard.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="js/global.js"></script>
+    <!-- END -->
+
+    <title>Document</title>
+</head>
+<body>
+    <div id="loading" style="width: 100%; height: 100%; position: absolute; z-index: 9999999; background-color: var(--bg-dark);">
+        <div id="loadingDots">
+            <img src="media/svg/circle.svg" />
+            <img src="media/svg/circle.svg" />
+            <img src="media/svg/circle.svg" />
+        </div>
+    </div>
+    <nav style="padding: 15px;">
+        <span style="font-family: RobotoL; font-weight: 500; display: inline; text-decoration: bold; font-size: 2rem;">
+            51st Bot
+            <span>
+                <a href="/about">About</a>
+                <a href="/home">Dashbaord</a>
+            </span>
+        </span>
+        <span id="details" style="float: right">
+            <span onclick="dropdownToggle()">
+                <span id="name"></span>
+                <img id="pfp" width="38" height="38"/>
+            </span>
+            
+            <div class="dropdown-content">
+                <a onclick="logOut()" style="color: var(--text-warn)">Sign out</a>
+            </div>
+        </span>
+    </nav>
+    <!--<section class="grid-container">
+        <div class="card">
+            <p class="card-title">&#128075; Welcome & Farewell</p>
+            <p class="card-desc">Configure Welcome & Farewell messages for your server and give newcomers a role!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+        <div class="card">
+            <p class="card-title">&#128200; Leveling</p>
+            <p class="card-desc">Configure leveling for your server and reward users based on their activity!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+
+        <div class="card">
+            <p class="card-title">&#128221; Mod-Logging</p>
+            <p class="card-desc">Configure Mod-Logging and log actions taken by the moderators of your server!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+        <div class="card">
+            <p class="card-title">&#9995; Reaction Roles</p>
+            <p class="card-desc">Configure Reaction Roles and give users roles when they react on a message!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+        <div class="card">
+            <p class="card-title">&#128680; N-Word Filtering</p>
+            <p class="card-desc">Configure N-Word Filtering and the punishment for anyone who dares to say it!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+    </section>-->
+
+
+
+
+
+
+
+
+
+    <script defer>
+        console.log("IF SOMEONE TOLD YOU TO GO HERE, THEY PROBABLY HAVE BAD INTENTS. CLOSE THIS WINDOW ASAP.")
+        var servers
+
+        // INIT XHTTP
+        var xhttp = new XMLHttpRequest();
+
+        // XHTTP REQUEST READY
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+
+                // IF TRYING TO GET SERVERS
+                if (xhttp.responseURL.includes("/api/discord/user_servers"))
+                {
+                    servers = JSON.parse(xhttp.response)
+
+                    xhttp.open("POST", "http://localhost/api/discord/user", true);
+        
+                    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                    var jsonObj = {
+                        token: sessionStorage.getItem("a_token")
+                    }
+                    
+                    xhttp.send(JSON.stringify(jsonObj));
+                }
+                // IF GETTING USER DATA
+                else if (xhttp.responseURL.includes("/api/discord/user"))
+                {
+                    var user = JSON.parse(xhttp.response)
+                    localStorage.setItem("user", xhttp.response)
+
+                    $('#pfp').attr("src", `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`)
+                    $('#name').html(`${user.username}#${user.discriminator}`)
+
+                    $("#loading").css("animation", "loadingScreenOut 0.3s forwards ease-in-out")
+                    setTimeout(() => {
+                        $("#loading").remove()
+                    }, 300);
+                }
+            }
+        };
+        // END
+
+
+        // GET SERVER DATA 
+        var jsonObj = {
+            token: sessionStorage.getItem("a_token")
+        }
+
+        xhttp.open("POST", "http://localhost/api/discord/user_servers", true);
+
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify(jsonObj));
+        // END
+    </script>
+</body>
+</html>

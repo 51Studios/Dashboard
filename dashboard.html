@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+
+
+    <!-- ASSETS -->
+    <link rel="stylesheet" type="text/css" href="css/global.css">
+    <link rel="stylesheet" type="text/css" href="css/dashboard.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="js/global.js"></script>
+    <!-- END -->
+
+    <title>Document</title>
+</head>
+<body onresize="sizeChanges()">
+    <div id="loading" style="width: 100%; height: 100%; position: absolute; z-index: 9999999; background-color: var(--bg-dark);">
+        <div id="loadingDots">
+            <img src="media/svg/circle.svg" />
+            <img src="media/svg/circle.svg" />
+            <img src="media/svg/circle.svg" />
+        </div>
+    </div>
+    <nav style="padding: 15px;">
+        <span style="font-family: RobotoL; font-weight: 500; display: inline; text-decoration: bold; font-size: 2rem;">
+            51st Bot
+            <span>
+                <a href="/about">About</a>
+                <a href="/home">Dashbaord</a>
+            </span>
+        </span>
+        <span id="details" style="float: right">
+            <span onclick="dropdownToggle()">
+                <span id="name"></span>
+                <img id="pfp" width="38" height="38"/>
+            </span>
+            
+            <div class="dropdown-content">
+                <a onclick="logOut()" style="color: var(--text-warn)">Sign out</a>
+            </div>
+        </span>
+    </nav>
+    <section class="grid-container" style="display: none;">
+        <div class="card">
+            <p class="card-title">&#128075; Welcome & Farewell</p>
+            <p class="card-desc">Configure Welcome & Farewell messages for your server and give newcomers a role!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+        <div class="card">
+            <p class="card-title">&#128200; Leveling</p>
+            <p class="card-desc">Configure leveling for your server and reward users based on their activity!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+        <div class="card">
+            <p class="card-title">&#9995; Reaction Roles</p>
+            <p class="card-desc">Configure Reaction Roles and give users roles when they react on a message!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+        <div class="card">
+            <p class="card-title">&#128680; Moderation</p>
+            <p class="card-desc">Configure anything from warns, invite links, N-Word Filtering, Mod-Logging to external links!</p>
+            <a class="card-conf">Configure</a>
+        </div>
+    </section>
+    <br>
+    <section id="err" style="text-align: center; display: none; font-family: RobotoT; margin-top: 25px;">
+        <p style="font-size: 50px; margin-bottom: 25px;">&#129300;</p>
+        <h1 id="errcode"></h1><br>
+        <h3 id="errmsg"></h3><br><br>
+        <h3 id="errdesc"></h3>
+    </section>
+    <br>
+    <section id="welcome" style="font-family: RobotoL; width: 100%;">
+        <a style="padding: 5px; border-radius: 4px; position: absolute; right: 0; margin: 15px 15px 0 0; border: 1px solid gray;">Back &#10140;</a>
+        <h1 style="text-align: center;">&#128075; Welcome & Farewell - Configuration</h1>
+
+        <div style="text-align: center; margin-top: 25px;">
+            Enabled:
+            <label class="switch">
+                <input id="wenabled" type="checkbox" checked>
+                <span class="slider round"></span>
+            </label>
+
+            <div>
+                <label for="wc">Welcome Channel:</label>
+                <select id="wc" name="wc"></select>
+            </div>
+            <div style="margin-top: 15px;">
+                <label for="fc">Farewell Channel:</label>
+                <select id="fc" name="fc"></select>
+            </div>
+            <div style="margin-top: 15px;">
+                <label for="r">Role for newcomers:</label>
+                <select id="r" name="r"></select>
+            </div>
+            <div style="margin-top: 15px;">
+                <label for="wmsg">Welcome Message:</label>
+                <textarea name="wmsg" id="wmsg" cols="40" rows="7" maxlength="240" style="background: none; font-family: RobotoL; padding: 5px; vertical-align: top; resize: none; border: 1px solid darkgray; border-radius: 2px;"></textarea>
+            </div>
+            <div style="margin-top: 15px;">
+                <label for="fmsg">Farewell Message:</label>
+                <textarea name="fmsg" id="fmsg" cols="40" rows="7" maxlength="240" style="background: none; font-family: RobotoL; padding: 5px; vertical-align: top; resize: none; border: 1px solid darkgray; border-radius: 2px;"></textarea>
+            </div>
+
+        </div>
+        
+    </section>
+
+
+    <div id="changes">
+        <div>
+            <p>New changes detected!</p>
+            <a class="btn btn-confirm">Save Changes</a>
+            <a class="btn btn-cancel">Discard Changes</a>
+        </div>
+    </div>
+
+
+
+
+    <script defer>
+        console.log("IF SOMEONE TOLD YOU TO GO HERE, THEY PROBABLY HAVE BAD INTENTS. CLOSE THIS WINDOW ASAP.")
+
+        var server = new URLSearchParams(window.location.search).get("server")
+
+        // INIT XHTTP
+        var xhttp = new XMLHttpRequest();
+
+        // XHTTP REQUEST READY
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                
+                // IF TRYING TO GET SERVERS
+                if (xhttp.responseURL.includes("/api/discord/server"))
+                {
+                    if (JSON.parse(xhttp.response).error) {
+                        var res = JSON.parse(xhttp.response)
+                        $(".grid-container").css("display", "none")
+                        $("#err").css("display", "block")
+                        $("#errcode").html(res.error)
+                        $("#errmsg").html(`<i>${res.message}</i>`)
+                        $("#errdesc").html(res.details)
+                    }
+                    else {
+                        localStorage.setItem(server.toString(), xhttp.response)
+                        newData = JSON.parse(localStorage.getItem(server)).dt
+                    }
+                    
+                    xhttp.open("POST", "http://localhost/api/discord/user", true);
+        
+                    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                    var jsonObj = {
+                        token: sessionStorage.getItem("a_token")
+                    }
+                    
+                    xhttp.send(JSON.stringify(jsonObj));
+                }
+                // IF GETTING USER DATA
+                else if (xhttp.responseURL.includes("/api/discord/user"))
+                {
+                    var user = JSON.parse(xhttp.response)
+                    localStorage.setItem("user", xhttp.response)
+
+                    $('#pfp').attr("src", `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`)
+                    $('#name').html(`${user.username}#${user.discriminator}`)
+
+                    $("#loading").css("animation", "loadingScreenOut 0.3s forwards ease-in-out")
+                    setTimeout(() => {
+                        $("#loading").remove()
+                    }, 300);
+                }
+            }
+        };
+        // END
+
+
+        // GET SERVER DATA 
+        var jsonObj = {
+            token: sessionStorage.getItem("a_token"),
+            server: server
+        }
+
+        xhttp.open("POST", "http://localhost/api/discord/server", true);
+
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify(jsonObj));
+        // END
+
+        var newData = {}
+
+
+
+        getWelcome()
+
+        function getWelcome() {
+            var serverData = JSON.parse(localStorage.getItem(server))
+
+            $("#wc").append(`<option value="${null}">----- Disabled -----</option>`)
+            $("#fc").append(`<option value="${null}">----- Disabled -----</option>`)
+            $("#r").append(`<option value="${null}">----- Disabled -----</option>`)
+
+            var wlookupChannel = serverData.dt.wchannel ? serverData.dt.wchannel : null
+            var flookupChannel = serverData.dt.fchannel ? serverData.dt.fchannel : null
+
+            for (var c of serverData.server.channels)
+            {
+                $("#wc").append(`<option value="${c.id}">#${c.name}</option>`)
+                $("#fc").append(`<option value="${c.id}">#${c.name}</option>`)
+                if (c.id == wlookupChannel) document.getElementById("wc").options.selectedIndex = serverData.server.channels.indexOf(c) + 1
+                if (c.id == flookupChannel) document.getElementById("fc").options.selectedIndex = serverData.server.channels.indexOf(c) + 1
+            }
+
+            for (var r of serverData.server.roles)
+            {
+                $("#r").append(`<option value="${r.id}" style="color: ${r.color == "#000000" ? "darkgray" : r.color};">${r.name}</option>`)
+                if (r.id == serverData.dt.role) {
+                    document.getElementById("r").options.selectedIndex = serverData.server.roles.indexOf(r) + 1
+                    document.getElementById("r").style.color = r.color
+                }
+            }
+
+            $("#r").on('change', () => {
+                var elm = document.getElementById("r").options
+
+                newData.role = elm[elm.selectedIndex].value == "null" ? null : elm[elm.selectedIndex].value
+
+                elm = serverData.server.roles.find(r => r.id == elm[elm.selectedIndex].value)
+                var color = "white"
+                if (elm) color = elm.color == "#000000" ? "darkgray" : elm.color
+                
+                document.getElementById("r").style.color = color
+                dispatchEvent(new Event('newData'))
+            })
+
+            $("#wc").on('change', () => {
+                var val = $("#wc option:selected").val()
+                newData.wchannel = val == "null" ? null : val
+                dispatchEvent(new Event('newData'))
+            })
+
+            $("#fc").on('change', () => {
+                var val = $("#fc option:selected").val()
+                newData.fchannel = val == "null" ? null : val
+                dispatchEvent(new Event('newData'))
+            })
+
+            $("#wmsg").val(!serverData.dt.wMsg ? "Welcome to {server}, {user}!" : serverData.dt.wMsg)
+            $("#wmsg").on("input", () => {
+                newData.wMsg = $("#wmsg").val()
+                dispatchEvent(new Event('newData'))
+            })
+
+            $("#fmsg").val(!serverData.dt.fMsg ? "Farewell, {user.tag}!" : serverData.dt.fMsg)
+            $("#fmsg").on("input", () => {
+                newData.fMsg = $("#fmsg").val()
+                dispatchEvent(new Event('newData'))
+            })
+
+            $("#wenabled").prop("checked", serverData.dt.enableWelcome)
+            $("#wenabled").on('change', () => {
+                newData.enableWelcome = $("#wenabled").is(":checked") ? 1 : 0
+                dispatchEvent(new Event('newData'))
+            })
+        }
+
+        const changes = addEventListener('newData', () => {
+            if (JSON.parse(localStorage.getItem(server)).dt.equals(newData))
+            {
+
+            }
+            else {
+
+            }
+        })
+
+        function SaveData() {
+            if (!JSON.parse(localStorage.getItem(server)).dt.equals(newData)) return;
+
+            var updateDtReq = new XMLHttpRequest()
+
+            updateDtReq.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    alert("Success!")
+                    this.style.display = "none";
+                }
+            };
+        }
+
+        function sizeChanges() {
+            
+        }
+    </script>
+</body>
+</html>

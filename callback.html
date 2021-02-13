@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Redirecting...</title>
+</head>
+<body>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.get("code"))
+        {
+            window.location.pathname = "/login.html"
+        }
+        else {
+            sessionStorage.setItem("token", urlParams.get("code"))
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var jsonRes = JSON.parse(xhttp.response)
+                    sessionStorage.setItem("a_token", jsonRes.access_token)
+                    window.location.href = "http://127.0.0.1:5500/home.html"
+                }
+            };
+
+            var jsonObj = {
+                "token": sessionStorage.getItem("token")
+            }
+            xhttp.open("POST", "http://localhost/api/discord/login", true);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify(jsonObj));
+        }
+    </script>
+</body>
+</html>
