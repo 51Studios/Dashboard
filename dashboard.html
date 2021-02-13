@@ -278,9 +278,20 @@
         })
 
         function SaveData() {
-            if (!JSON.parse(localStorage.getItem(server)).dt.equals(newData)) return;
+            if (JSON.parse(localStorage.getItem(server)).dt.equals(newData)) return;
+
+            var dt = {
+                data: JSON.parse(localStorage.getItem(server)).dt,
+                token: sessionStorage.getItem("a_token"),
+                server: JSON.parse(localStorage.getItem(server)).server.id
+            }
 
             var updateDtReq = new XMLHttpRequest()
+
+            updateDtReq.open("POST", "http://localhost/api/discord/savedata", true);
+
+            updateDtReq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            updateDtReq.send(JSON.stringify(dt));
 
             updateDtReq.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
