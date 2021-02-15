@@ -19,7 +19,7 @@
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     var jsonRes = JSON.parse(xhttp.response)
-                    sessionStorage.setItem("a_token", jsonRes.access_token)
+                    sessionStorage.setItem("a_token", JSON.stringify(jsonRes.access_token))
                     window.location.href = "http://127.0.0.1:5500/home.html"
                 }
             };

@@ -203,8 +203,8 @@
             $("#fc").append(`<option value="${null}">----- Disabled -----</option>`)
             $("#r").append(`<option value="${null}">----- Disabled -----</option>`)
 
-            var wlookupChannel = serverData.dt.wchannel ? serverData.dt.wchannel : null
-            var flookupChannel = serverData.dt.fchannel ? serverData.dt.fchannel : null
+            var wlookupChannel = serverData.dt["wchannel"] ? serverData.dt["wchannel"] : null
+            var flookupChannel = serverData.dt["fchannel"] ? serverData.dt["fchannel"] : null
 
             for (var c of serverData.server.channels)
             {
@@ -248,19 +248,19 @@
                 dispatchEvent(new Event('newData'))
             })
 
-            $("#wmsg").val(!serverData.dt.wMsg ? "Welcome to {server}, {user}!" : serverData.dt.wMsg)
+            $("#wmsg").val(!serverData.dt["wMsg"] ? "Welcome to {server}, {user}!" : serverData.dt["wMsg"])
             $("#wmsg").on("input", () => {
                 newData.wMsg = $("#wmsg").val()
                 dispatchEvent(new Event('newData'))
             })
 
-            $("#fmsg").val(!serverData.dt.fMsg ? "Farewell, {user.tag}!" : serverData.dt.fMsg)
+            $("#fmsg").val(!serverData.dt["fMsg"] ? "Farewell, {user.tag}!" : serverData.dt["fMsg"])
             $("#fmsg").on("input", () => {
                 newData.fMsg = $("#fmsg").val()
                 dispatchEvent(new Event('newData'))
             })
 
-            $("#wenabled").prop("checked", serverData.dt.enableWelcome)
+            $("#wenabled").prop("checked", serverData.dt["enableWelcome"])
             $("#wenabled").on('change', () => {
                 newData.enableWelcome = $("#wenabled").is(":checked") ? 1 : 0
                 dispatchEvent(new Event('newData'))
@@ -281,7 +281,7 @@
             if (JSON.parse(localStorage.getItem(server)).dt.equals(newData)) return;
 
             var dt = {
-                data: JSON.parse(localStorage.getItem(server)).dt,
+                data: newData,
                 token: sessionStorage.getItem("a_token"),
                 server: JSON.parse(localStorage.getItem(server)).server.id
             }
@@ -289,14 +289,18 @@
             var updateDtReq = new XMLHttpRequest()
 
             updateDtReq.open("POST", "http://localhost/api/discord/savedata", true);
+            let temp = JSON.parse(localStorage.getItem(server))
+            temp.dt = newData
+
+            localStorage.setItem(server, JSON.stringify(temp))
 
             updateDtReq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             updateDtReq.send(JSON.stringify(dt));
 
             updateDtReq.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
+
                     alert("Success!")
-                    this.style.display = "none";
                 }
             };
         }
