@@ -1,5 +1,26 @@
+a {
+    :not(nav):not(.btn):not(.hover-link) {
+        text-decoration: underline !important;
+        color: #fff !important;
+    }
 
-/* VARS */
+    color: inherit;
+}
+
+a.hover-link {
+    text-decoration: none;
+
+    :hover {
+        color: #fff !important;
+        text-decoration: underline !important;
+    }
+}
+
+/* a:not(.hover-link):not(.btn) {
+    color: inherit;
+} */
+
+/* 
 
 :root {
     --bg-dark: #212529;
@@ -9,11 +30,6 @@
     --btn-confirm: #198754;
     --btn-cancel: #9e1230;
 }
-
-/* END */
-
-
-/* GLOBALS */
 
 * {
     margin: 0;
@@ -57,11 +73,6 @@ img,
     border-color: var(--btn-cancel);
 }
 
-
-/* END */
-
-
-
 nav {
     background-color: var(--bg-dark);
     box-shadow: .5rem .5rem 1rem rgba(0, 0, 0, .15)
@@ -85,10 +96,6 @@ nav span .dropdown-content {
     border-radius: 5px;
     display: none;
 }
-
-
-
-/* ANIMATIONS */
 
 @keyframes goDown {
     0% {
@@ -131,11 +138,6 @@ nav span .dropdown-content {
     }
 }
 
-/* END */
-
-
-/* LOADING SCREEN */
-
 #loadingDots img {
     width: 25px;
 }
@@ -158,23 +160,4 @@ nav span .dropdown-content {
 #loadingDots img:last-of-type {
     animation: dotLoad 1s 0.2s infinite ease-in-out;
 }
-
-/* END */
-
-
-/* FONTS */
-
-@font-face {
-    src: url('../fonts/Roboto-Thin.ttf');
-    font-family: RobotoT;
-}
-
-@font-face {
-    src: url('../fonts/Roboto-Medium.ttf');
-    font-family: RobotoM;
-}
-
-@font-face {
-    src: url('../fonts/Roboto-Light.ttf');
-    font-family: RobotoL;
-}
+*/
